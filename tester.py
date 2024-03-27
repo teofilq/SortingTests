@@ -1,9 +1,15 @@
 import sys
 import time
-#nr recursiuni
+import signal
+
 sys.setrecursionlimit(1000000000)
-#adaugam functiile de sortare
-from sorter import countingSort, quickSort, shellSort, margesort, radix
+
+from sorter import counting_sort, quick_sort, shell_sort, merge_sort, radix_sort
+
+def signal_handler(signum, frame):
+    raise Exception("The sorting operation exceeded the 2-minute limit.")
+
+signal.signal(signal.SIGALRM, signal_handler)
 
 def read_tests(filename):
     tests = []
@@ -11,7 +17,7 @@ def read_tests(filename):
         while True:
             line = file.readline()
             if not line:
-                break  
+                break
             n = int(line.strip())
             maxim = int(file.readline().strip())
             elements = list(map(int, file.readline().strip().split()))
@@ -21,31 +27,31 @@ def read_tests(filename):
 def test_sort_function(sort_function_name, sort_function, tests):
     print(f"Testing {sort_function_name}...")
     for n, maxim, elements in tests:
-        elements_copy = elements[:] # Copiem lista pentru a nu o modifica
-        start_time = time.time()
-        if sort_function_name == 'quickSort':
-            sort_function(elements_copy, 0, len(elements_copy) - 1)
-        else:
-            elements_copy = sort_function(elements_copy)  # Alte sortări
-        end_time = time.time()
-        print(f"Test cu N={n}, MAXIM={maxim}: {end_time - start_time} secunde")
-        # Verificăm dacă lista este corect sortată
-        assert elements_copy == sorted(elements), "Lista nu este corect sortată!"
+        try:
+            signal.alarm(120)  # 120 seconds = 2 minutes
+            elements_copy = elements[:]  
+            start_time = time.time()
+            sorted_elements = sort_function(elements_copy)
+            end_time = time.time()
+            signal.alarm(0)  
+            print(f"Test with N={n}, MAX={maxim}: {end_time - start_time} seconds")
+            # Check if correctly sorted
+            assert sorted_elements == sorted(elements), "List is not correctly sorted!"
+        except Exception as e:
+            print(e)
     print(f"{sort_function_name} testing completed.\n")
 
 tests = read_tests('tests.txt')
 
-# Dicționar de funcții de sortare pentru a simplifica apelurile
 sort_functions = {
-    # 'countingSort': countingSort,
-     'quickSort': quickSort,
-    #'shellSort': lambda L: shellSort(L, len(L)), 
-    #'margesort': margesort,
-    # 'radix (baza 10)': lambda L: radix(10, L),
-    # 'radix (2**16)': lambda L: radix(2**16, L),
-    # 'pythonSorted': sorted, 
+    #'counting_sort': counting_sort,
+    #'quick_sort': quick_sort,
+    #'shell_sort': shell_sort, 
+    #'merge_sort': merge_sort,
+    #'radix_sort_b10': lambda L: radix_sort(L, 10),
+    'radix_sort_b16': lambda L: radix_sort(L, 2**16),
+    #'python_sorted': sorted,
 }
-
 
 for name, function in sort_functions.items():
     test_sort_function(name, function, tests)
