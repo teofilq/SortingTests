@@ -1,3 +1,4 @@
+
 Testing counting_sort...
 Test with N=1000, MAX=1000: 0.00019478797912597656 seconds
 Test with N=1000, MAX=10000: 0.001127004623413086 seconds

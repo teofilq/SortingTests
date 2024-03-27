@@ -49,7 +49,7 @@ sort_functions = {
     #'shell_sort': shell_sort, 
     #'merge_sort': merge_sort,
     #'radix_sort_b10': lambda L: radix_sort(L, 10),
-    'radix_sort_b16': lambda L: radix_sort(L, 2**16),
+    'radix_sort_b2^16': lambda L: radix_sort(L, 2**16),
     #'python_sorted': sorted,
 }
 
